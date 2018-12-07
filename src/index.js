@@ -9,6 +9,8 @@ const DB = require('./db.js');
 const app = express();
 const port = process.env.PORT || 80;
 
+const db = DB();
+
 // Return a list of currencies supported by Kyber.
 app.get(config.app.path + '/currencies', async (req, res) => {
   let currencies = [];
@@ -55,9 +57,8 @@ app.get(config.app.path + '/currencies/:token', async (req, res) => {
   }
 
   // Convert the timestamp to block numbers.
-  const blocks = Utils.getBlocksBetweenTimestamps(req.query.start, req.query.stop);
-
-  res.status(200).send({status: "ok", message: "Token is supported by Kyber"});
+  const ret = db.getTokenTradeData(token, req.query.start, req.query.stop);
+  res.status(200).send({status: "ok", results: ret});
 });
 
 app.listen(port, () => console.log(`app listening on ${port}`));

@@ -1,4 +1,5 @@
 const config = require('../common/config.json');
+const Utils = require('./utils.js');
 
 const mysql = require('mysql');
 
@@ -47,16 +48,22 @@ class DB {
         const lastBlockTimestamp = results[0].timestamp;
         if (stop > lastBlockTimestamp) {
           // get blocks from (lastBlockTimestamp + 1, stop)
+          const blocks = Utils.getBlocksBetweenTimestamps(lastBlockTimestamp + 1, stop);
+
           // insert them into DB.
         }
 
         const firstBlockTimestamp = results[results.length - 1].timestamp;
         if (start < firstBlockTimestamp {
           // get blocks from (start, firstBlockTimestamp - 1)
+          const blocks = Utils.getBlocksBetweenTimestamps(start, firstBlockTimestamp - 1);
+
           // insert them into db.
         }
       } else {
         // get blocks from (start, stop) from blockchain
+        const blocks = Utils.getBlocksBetweenTimestamps(start, stop);
+
         // insert them into db.
       }
     }).catch((err) => {return null});
