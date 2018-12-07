@@ -1,4 +1,4 @@
-const config = require('./common/config.json');
+const config = require('../common/config.json');
 
 const Web3 = require('web3');
 let web3 = new Web3(new Web3.providers.HttpProvider(config.infura.mainnet.host));
@@ -79,6 +79,11 @@ const Utils = {
       startBlock: startBlock,
       endBlock: endBlock,
     };
+  },
+
+  isValidTimestamp: (timestamp) => {
+    const newTimestamp = new Date(timestamp).getTime();
+    return !isNaN(parseFloat(newTimestamp)) && isFinite(newTimestamp);
   },
 };
 

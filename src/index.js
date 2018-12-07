@@ -1,6 +1,7 @@
 const express = require('express');
 const config = require('../common/config.json');
 const Kyber = require('./kyber.js');
+const Utils = require('./utils.js');
 
 const app = express();
 const port = process.env.PORT || 80;
@@ -41,6 +42,15 @@ app.get(config.app.path + '/currencies/:token', async (req, res) => {
   }
 
   // Validate the timestamps.
+
+  if (!Utils.isValidTimestamp(req.query.start)) {
+    res.status(400).send({status: "error", error: "invalid start timestamp"});
+    return;
+  }
+  if (!Utils.isValidTimestamp(req.query.stop)) {
+    res.status(400).send({status: "error", error: "invalid stop timestamp"});
+    return;
+  }
 
   // Convert the timestamp to block numbers.
   const blocks = Utils.getBlocksBetweenTimestamps(req.query.start, req.query.stop);
