@@ -1,0 +1,30 @@
+{
+  "app": {
+    "path": "/api/v1"
+  },
+  "infura": {
+    "mainnet": {
+      "host": "https://mainnet.infura.io/v3/aa055fbdf8474ec79929cbaff2328d45"
+    }
+  },
+  "kyber": {
+    "mainnet": {
+      "host": "https://api.kyber.network",
+      "contract": {
+        "address": "0x964f35fae36d75b1e72770e244f6595b68508cf5"
+      }
+    }
+  },
+  "etherscan": {
+    "host": "http://api.etherscan.io/api",
+    "apiKey": "IQYXJBYN9KXIUMAT3YCU1W2BEME57J2SM4"
+  },
+  "aws": {
+    "mysql": {
+      "host": "ethsghack.cpemymxl5jcj.ap-southeast-1.rds.amazonaws.com",
+      "port": 3306,
+      "username": "robin",
+      "password": "aAbBcCdDeE"
+    }
+  }
+}
