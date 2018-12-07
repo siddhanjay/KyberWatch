@@ -19,6 +19,7 @@
   "homepage": "https://github.com/siddhanjay/KyberWatch#readme",
   "dependencies": {
     "express": "^4.16.4",
-    "node-fetch": "^2.3.0"
+    "node-fetch": "^2.3.0",
+    "web3": "^1.0.0-beta.36"
   }
 }

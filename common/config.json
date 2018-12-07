@@ -1,6 +1,6 @@
 {
   "app": {
-    "path": "/api/v1"
+    "path": "/api/v1/kyber"
   },
   "infura": {
     "mainnet": {
