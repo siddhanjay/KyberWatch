@@ -7,14 +7,15 @@ class DB {
   constructor() {
     this.connection = mysql.createConnection({
       host: config.aws.mysql.host,
-      user: config.aws,mysql.username,
+      user: config.aws.mysql.username,
       database: config.aws.mysql.db,
+      password: config.aws.mysql.password
     });
 
     this.connection.connect();
   }
 
-  getTokenTradeData: (token, start, stop) => {
+  getTokenTradeData(token, start, stop) {
     // Find the data that is present in the DB within this timestamp.
     const getQuery = () => {
       return new Promise((resolve, reject) => {
@@ -35,7 +36,7 @@ class DB {
     const insertQuery = (args) => {
       this.connection.query({
         sql: 'INSERT INTO token_trades(token, timestamp, quantity, price, block) VALUES(?,?,?,?,?)',
-        timeout: 4000s,
+        timeout: 4000, // 4s
         values: [args.token, args.timestamp, args.quantity, args.price, args.block],
       }, (error, results, field) => {
         return (error) ? false : true;
@@ -54,7 +55,7 @@ class DB {
         }
 
         const firstBlockTimestamp = results[results.length - 1].timestamp;
-        if (start < firstBlockTimestamp {
+        if (start < firstBlockTimestamp) {
           // get blocks from (start, firstBlockTimestamp - 1)
           const blocks = Utils.getBlocksBetweenTimestamps(start, firstBlockTimestamp - 1);
 

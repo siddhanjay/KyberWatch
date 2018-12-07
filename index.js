@@ -1,15 +1,20 @@
 const express = require('express');
+const cors = require('cors');
 
-const config = require('../common/config.json');
+const config = require('./common/config.json');
 
-const Kyber = require('./kyber.js');
-const Utils = require('./utils.js');
-const DB = require('./db.js');
+const Kyber = require('./src/kyber.js');
+const Utils = require('./src/utils.js');
+const DB = require('./src/db.js');
+const db = new DB();
 
 const app = express();
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 4000;
 
-const db = DB();
+app.use(cors());
+app.use(express.json());
+app.options('*', cors());
+app.use(express.static(__dirname + '/public'));
 
 // Return a list of currencies supported by Kyber.
 app.get(config.app.path + '/currencies', async (req, res) => {
@@ -22,7 +27,7 @@ app.get(config.app.path + '/currencies', async (req, res) => {
   res.status(200).send({status: "ok", results: currencies});
 });
 
-app.get(config.app.path + '/currencies/:token', async (req, res) => {
+app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
   // Check if token is supported.
   let token = null;
   try {
