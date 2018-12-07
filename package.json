@@ -1,0 +1,19 @@
+{
+  "name": "kyberwatch",
+  "version": "1.0.0",
+  "description": "Historical data lookup of currencies supported by Kyber",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siddhanjay/KyberWatch.git"
+  },
+  "author": "Robin Thomas, Siddhanjay Godre",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/siddhanjay/KyberWatch/issues"
+  },
+  "homepage": "https://github.com/siddhanjay/KyberWatch#readme"
+}
