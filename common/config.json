@@ -21,10 +21,11 @@
   },
   "aws": {
     "mysql": {
-      "host": "ethsghack.cpemymxl5jcj.ap-southeast-1.rds.amazonaws.com",
+      "host": "ethsg.cpemymxl5jcj.ap-southeast-1.rds.amazonaws.com",
       "port": 3306,
       "username": "robin",
-      "password": "aAbBcCdDeE"
+      "password": "aAbBcCdDeE",
+      "database": "ethsg"
     }
   }
 }
