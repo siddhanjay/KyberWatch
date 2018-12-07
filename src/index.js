@@ -2,7 +2,7 @@ const express = require('express');
 const config = require('../common/config.json');
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 80;
 
 // Return a list of currencies supported by Kyber.
 app.get(config.app.path + '/kyber/currencies', (req, res) => {
