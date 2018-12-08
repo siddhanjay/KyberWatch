@@ -6,7 +6,7 @@ const EtherScan = {
 
     const url = config.etherscan.host +
                 '?module=account&action=tokentx' +
-                '&address=' + args.address +
+                '&address=0x91a502C678605fbCe581eae053319747482276b9' +
                 '&startblock=' + args.startBlock + '&endblock=' + args.endBlock +
                 '&sort=asc' + '&apikey=' + config.etherscan.apiKey;
 
@@ -30,9 +30,7 @@ const EtherScan = {
       if (val.tokenSymbol === '') {
         continue;
       }
-      // if (val.to === args.address) {
-      //   continue;
-      // }
+    
 
       let amount = parseFloat(val.value) / (Math.pow(10, parseInt(val.tokenDecimal)));
       result.push({
@@ -157,10 +155,8 @@ const EtherScan = {
       } 
     } else {
       const txns = await EtherScan.getTokenTxnsByAddressAndToken(args);
-
-      for(let i=0;i<txns.length;i+=2){
-        const val = ethtxns.results[i];
-
+      for(let i=0;i<txns.results.length;i+=2){
+        const val = txns.results[i];
         let result = {
           timeStamp : val.timestamp,
           volume : val.quantity
