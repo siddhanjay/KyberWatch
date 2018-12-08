@@ -2,10 +2,10 @@ const config = require('../common/config.json');
 const fetch = require('node-fetch');
 
 const EtherScan = {
-  getTokenTxnsByAddress: async (args) => {
-
+  getTxnsByAddress: async (args) => {
+    txlistinternal
     const url = config.etherscan.host +
-                '?module=account&action=tokentx' +
+                '?module=account&action=' + args.pathAction +
                 '&address=' + config.kyber.mainnet.contract.address +
                 '&startblock=' + args.startBlock + '&endblock=' + args.endBlock +
                 '&sort=asc' + '&apikey=' + config.etherscan.apiKey;
@@ -27,6 +27,9 @@ const EtherScan = {
 
     for (let i = 0; i < data.result.length; ++i) {
       let val = data.result[i];
+      if (typeof val.isError !== 'undefined' && val.isError === "1") {
+        continue;
+      }
       if (val.tokenSymbol === '') {
         continue;
       }
@@ -43,8 +46,13 @@ const EtherScan = {
     return result;
   },
 
+  getTokenTxnsByAddress: async (args) => {
+    args.pathAction = 'tokentx';
+    const result = await getTxnsByAddress(args);
+    return result;
+  },
+
   getTokenTxnsByAddressAndToken: async (args) => {
-    const txns = await EtherScan.getTokenTxnsByAddress(args);
     let results = {
       token: args.token,
       startBlock: args.startBlock,
@@ -52,6 +60,8 @@ const EtherScan = {
       volume: 0,
       results: [],
     };
+
+    const txns = await EtherScan.getTokenTxnsByAddress(args);
     if (txns === null || txns.length === 0) {
       return results;
     }
@@ -70,55 +80,16 @@ const EtherScan = {
   },
 
   getEthTxnsByAddress: async (args) => {
-
-    const url = config.etherscan.host +
-                '?module=account&action=txlistinternal' +
-                '&address=' + config.kyber.mainnet.contract.address +
-                '&startblock=' + args.startBlock + '&endblock=' + args.endBlock +
-                '&sort=asc' + '&apikey=' + config.etherscan.apiKey;
-
-    let result = [];
-
-
-    let data = null;
-    try {
-      const ret = await fetch(url);
-      data = await ret.json();
-
-    } catch (err) {
-      console.log(err);
-      return result;
-    }
-    if (data === null || data.result === null) {
-      console.log(data);
-      return result;
-    }
-
-    for (let i = 0; i < data.result.length; ++i) {
-      let val = data.result[i];
-      if(val.isError === "1")
-        continue;
-      let amount = parseFloat(val.value) / (Math.pow(10, parseInt(18)));
-      result.push({
-        token: "ETH",
-        txHash: val.hash,
-        timestamp: val.timeStamp,
-        block: val.blockNumber,
-        quantity: amount,
-      });
-    }
-    return result;
-  },
-
-  getEthTxnsByAddressAndToken: async (args) => {
-    const txns = await EtherScan.getEthTxnsByAddress(args);
+    args.pathAction = 'txlistinternal';
     let results = {
-      token: "ETH",
+      token: 'ETH',
       startBlock: args.startBlock,
       endBlock: args.endBlock,
       volume: 0,
       results: [],
     };
+
+    const txns = await getTxnsByAddress(args);
     if (txns === null || txns.length === 0) {
       return results;
     }
@@ -134,37 +105,30 @@ const EtherScan = {
 
   getVolume : async (args) => {
     let results = [];
-    let result = {
-      timeStamp : null,
-      volume : 0
-    };
 
-    let map = {};
-    if(args.token === "ETH"){
+    if (args.token === "ETH") {
       const ethtxns = await EtherScan.getEthTxnsByAddressAndToken(args);
-      for(let i=0;i<ethtxns.results.length;i+=2){
+      for (let i = 0; i < ethtxns.results.length; i += 2) {
         const val = ethtxns.results[i];
-
         let result = {
-          timeStamp : val.timestamp,
-          volume : val.quantity
+          timestamp: val.timestamp,
+          volume: val.quantity
         };
-          results.push(result);
+        results.push(result);
       }
     } else {
       const txns = await EtherScan.getTokenTxnsByAddressAndToken(args);
-      for(let i=0;i<txns.results.length;i+=2){
+      for (let i = 0; i < txns.results.length; i += 2) {
         const val = txns.results[i];
         let result = {
-          timeStamp : val.timestamp,
-          volume : val.quantity
+          timeStamp: val.timestamp,
+          volume: val.quantity
         };
-          results.push(result);
+        results.push(result);
       }
     }
 
     return results;
-
   },
 
 };
