@@ -15,7 +15,31 @@ class DB {
     this.connection.connect();
   }
 
-  getTokenTradeData(token, start, stop) {
+  retrieveAndInsert(blocks) {
+    const insertQuery = (args) => {
+      this.connection.query({
+        sql: 'INSERT INTO token_trades(token, timestamp, quantity, price, block) VALUES(?,?,?,?,?)',
+        timeout: 4000, // 4s
+        values: [args.token, args.timestamp, args.quantity, args.price, args.block],
+      }, (error, results, field) => {
+        return (error) ? false : true;
+      });
+    };
+
+    const txns = await EtherScan.getTokenTxnsByAddressAndToken({
+      token: token,
+      startBlock: blocks.startBlock,
+      stopBlock: blocks.stopBlock,
+    });
+
+    for (let i = 0; i < txns.results; ++i) {
+      // TOOD: Set the price.
+      txns.results[i].price = 1;
+      insertQuery(txns.results[i]);
+    }
+  }
+
+  async getTokenTradeData(token, start, stop) {
     // Find the data that is present in the DB within this timestamp.
     const getQuery = () => {
       return new Promise((resolve, reject) => {
@@ -33,42 +57,29 @@ class DB {
       });
     };
 
-    const insertQuery = (args) => {
-      this.connection.query({
-        sql: 'INSERT INTO token_trades(token, timestamp, quantity, price, block) VALUES(?,?,?,?,?)',
-        timeout: 4000, // 4s
-        values: [args.token, args.timestamp, args.quantity, args.price, args.block],
-      }, (error, results, field) => {
-        return (error) ? false : true;
-      });
-    };
-
-    getQuery()
-    .then((results) => {
-      if (results && results.length > 0) {
-        const lastBlockTimestamp = results[0].timestamp;
-        if (stop > lastBlockTimestamp) {
-          // get blocks from (lastBlockTimestamp + 1, stop)
-          const blocks = Utils.getBlocksBetweenTimestamps(lastBlockTimestamp + 1, stop);
-
-          // insert them into DB.
-        }
-
-        const firstBlockTimestamp = results[results.length - 1].timestamp;
-        if (start < firstBlockTimestamp) {
-          // get blocks from (start, firstBlockTimestamp - 1)
-          const blocks = Utils.getBlocksBetweenTimestamps(start, firstBlockTimestamp - 1);
-
-          // insert them into db.
-        }
-      } else {
-        // get blocks from (start, stop) from blockchain
-        const blocks = Utils.getBlocksBetweenTimestamps(start, stop);
-
-        // insert them into db.
+    const results = await getQuery();
+    if (results && results.length > 0) {
+      const lastBlockTimestamp = results[0].timestamp;
+      if (stop > lastBlockTimestamp) {
+        // get blocks from (lastBlockTimestamp + 1, stop)
+        const blocks = await Utils.getBlocksBetweenTimestamps(lastBlockTimestamp + 1, stop);
+        retrieveAndInsert(blocks);
       }
-    }).catch((err) => {return null});
 
+      const firstBlockTimestamp = results[results.length - 1].timestamp;
+      if (start < firstBlockTimestamp) {
+        // get blocks from (start, firstBlockTimestamp - 1)
+        const blocks = await Utils.getBlocksBetweenTimestamps(start, firstBlockTimestamp - 1);
+        retrieveAndInsert(blocks);
+      }
+    } else {
+      // get blocks from (start, stop) from blockchain
+      const blocks = await Utils.getBlocksBetweenTimestamps(start, stop);
+      retrieveAndInsert(blocks);
+    }
+
+    const newResults = await getQuery();
+    return newResults;
   }
 };
 
