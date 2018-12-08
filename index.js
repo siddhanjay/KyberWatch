@@ -29,13 +29,8 @@ app.get(config.app.path + '/currencies', async (req, res) => {
 
 app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
   // Check if token is supported.
-  let token = null;
   try {
-    token = req.params.token;
-    const supportedCurrencies = await Kyber.getSupportedCurrencies();
-    if (supportedCurrencies.indexOf(token) === -1) {
-      throw new Error('Token is not supported by Kyber');
-    }
+    Kyber.checkForTokenSupport(req.params.token);
   } catch (err) {
     res.status(400).send({status: "error", error: err.message});
     return;
@@ -62,37 +57,27 @@ app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
   }
 
   // Convert the timestamp to block numbers.
-  const ret = db.getTokenTradeData(token, req.query.start, req.query.stop);
+  const ret = db.getTokenTradeData(req.params.token, req.query.start, req.query.stop);
   res.status(200).send({status: "ok", results: ret});
 });
 
 app.get(config.app.path + '/currencies/:token/stats', async (req, res) => {
   // Check if token is supported.
-  let token = null;
   try {
-    token = req.params.token;
-    const supportedCurrencies = await Kyber.getSupportedCurrencies();
-    if (supportedCurrencies.indexOf(token) === -1) {
-      throw new Error('Token is not supported by Kyber');
-    }
+    Kyber.checkForTokenSupport(req.params.token);
   } catch (err) {
     res.status(400).send({status: "error", error: err.message});
     return;
   }
 
-  const stats = await Kyber.getTokenStats(token);
+  const stats = await Kyber.getTokenStats(req.params.token);
   res.status(200).send({status: "ok", results: stats});
 });
 
 app.get(config.app.path + '/currencies/:token/volume', async (req, res) => {
   // Check if token is supported.
-  let token = null;
   try {
-    token = req.params.token;
-    const supportedCurrencies = await Kyber.getSupportedCurrencies();
-    if (supportedCurrencies.indexOf(token) === -1) {
-      throw new Error('Token is not supported by Kyber');
-    }
+    Kyber.checkForTokenSupport(req.params.token);
   } catch (err) {
     res.status(400).send({status: "error", error: err.message});
     return;
@@ -121,7 +106,7 @@ app.get(config.app.path + '/currencies/:token/volume', async (req, res) => {
   // Convert the timestamp to block numbers.
   const blocks = await Utils.getBlocksBetweenTimestamps(req.query.start, req.query.stop);
 
-  const vol = await etherscan.getVolume({token: token, startBlock: blocks.startBlock, endBlock: blocks.endBlock});
+  const vol = await etherscan.getVolume({token: req.params.token, startBlock: blocks.startBlock, endBlock: blocks.endBlock});
   res.status(200).send({status: "ok", results: vol});
 });
 

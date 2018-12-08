@@ -37,6 +37,17 @@ const Kyber = {
 
     return null;
   },
+
+  checkForTokenSupport: async (token) => {
+    try {
+      const supportedCurrencies = await Kyber.getSupportedCurrencies();
+      if (supportedCurrencies.indexOf(token) === -1) {
+        throw new Error('Token is not supported by Kyber');
+      }
+    } catch (err) {
+      throw err;
+    }
+  },
 };
 
 module.exports = Kyber;
