@@ -6,7 +6,7 @@ const EtherScan = {
     const url = config.etherscan.host +
                 '?module=account&action=' + args.pathAction +
                 '&address=' + config.kyber.mainnet.contract.address +
-                '&startblock=' + args.startBlock + '&endblock=' + args.endBlock +
+                '&startblock=' + args.startBlock + '&endblock=' + args.stopBlock +
                 '&sort=asc' + '&apikey=' + config.etherscan.apiKey;
 
     let result = [];
@@ -37,7 +37,7 @@ const EtherScan = {
       result.push({
         token: val.tokenSymbol,
         txHash: val.hash,
-        timestamp: val.timeStamp,
+        timestamp: parseInt(val.timeStamp),
         block: val.blockNumber,
         quantity: amount,
       });
@@ -47,7 +47,7 @@ const EtherScan = {
 
   getTokenTxnsByAddress: async (args) => {
     args.pathAction = (typeof args.token !== 'undefined' && args.token === 'ETH') ? 'txlistinternal': 'tokentx';
-    const result = await getTxnsByAddress(args);
+    const result = await EtherScan.getTxnsByAddress(args);
     return result;
   },
 
@@ -55,7 +55,7 @@ const EtherScan = {
     let results = {
       token: args.token,
       startBlock: args.startBlock,
-      endBlock: args.endBlock,
+      stopBlock: args.stopBlock,
       volume: 0,
       results: [],
     };

@@ -11,7 +11,11 @@ const getLastBlockBeforeTimestamp = async (currentBlock, timestamp) => {
   let lastBlock = currentBlock.block - diffBlocks;
 
   do {
-    lastBlockTimestamp = (await web3.eth.getBlock(lastBlock)).timestamp;
+    try {
+      lastBlockTimestamp = (await web3.eth.getBlock(lastBlock)).timestamp;
+    } catch (err) {
+      console.log(err);
+    }
     if (lastBlockTimestamp > timestamp) {
       diffBlocks = Math.floor((lastBlockTimestamp - timestamp) / 15);
       diffBlocks = diffBlocks == 0 ? 1 : diffBlocks;
@@ -70,14 +74,14 @@ const Utils = {
     start = (start < 0) ? 0 : start;
     stop = (stop > currentBlockTimestamp) ? currentBlockTimestamp : stop;
 
-    const endBlock = await getLastBlockBeforeTimestamp(
-      {block: currentBlock, timestamp: currentBlockTimestamp}, start);
+    const stopBlock = await getLastBlockBeforeTimestamp(
+      {block: currentBlock, timestamp: currentBlockTimestamp}, stop);
     const startBlock = await getFirstBlockAfterTimestamp(
-      {block: endBlock, timestamp: (await web3.eth.getBlock(endBlock)).timestamp}, stop);
+      {block: stopBlock, timestamp: (await web3.eth.getBlock(stopBlock)).timestamp}, start);
 
     return {
       startBlock: startBlock,
-      endBlock: endBlock,
+      stopBlock: stopBlock,
     };
   },
 

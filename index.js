@@ -47,17 +47,17 @@ app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
   }
 
   // Validate the timestamps.
-  if (!Utils.isValidTimestamp(req.query.start)) {
-    res.status(400).send({status: "error", error: "invalid start timestamp"});
-    return;
-  }
-  if (!Utils.isValidTimestamp(req.query.stop)) {
-    res.status(400).send({status: "error", error: "invalid stop timestamp"});
-    return;
-  }
+  // if (!Utils.isValidTimestamp(req.query.start)) {
+  //   res.status(400).send({status: "error", error: "invalid start timestamp"});
+  //   return;
+  // }
+  // if (!Utils.isValidTimestamp(req.query.stop)) {
+  //   res.status(400).send({status: "error", error: "invalid stop timestamp"});
+  //   return;
+  // }
 
   // Convert the timestamp to block numbers.
-  const ret = db.getTokenTradeData(req.params.token, req.query.start, req.query.stop);
+  const ret = await db.getTokenTradeData(req.params.token, parseInt(req.query.start), parseInt(req.query.stop));
   res.status(200).send({status: "ok", results: ret});
 });
 
@@ -74,4 +74,4 @@ app.get(config.app.path + '/currencies/:token/stats', async (req, res) => {
   res.status(200).send({status: "ok", results: stats});
 });
 
-app.listen(port, () => console.log(`app listening on ${port}`));
+app.listen(port, async () => console.log(`app listening on ${port}`));
