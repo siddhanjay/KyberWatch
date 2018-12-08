@@ -52,25 +52,30 @@ const Kyber = {
       throw err;
     }
   },
+<<<<<<< HEAD
   
   getTokenLastOrders: async (token, count) => {
+=======
+
+  getLastOrders: async (count) => {
+>>>>>>> db1621ae6dcd9500222b5d9be145ac3c4d7530e4
     currentBlock = await web3.eth.getBlockNumber();
 
     let results = [];
-
     do {
       const args = {
-        token: token,
-        startBlock: currentBlock - 100,
+        startBlock: currentBlock - 20,
         stopBlock: currentBlock,
+        count: count,
+        pathAction: 'tokentx',
       };
 
       try {
-        const txns = await EtherScan.getTokenTxnsByAddressAndToken(args);
-        if (txns && txns.results && txns.results.length > 0) {
-          results = results.concat(txns.results.reverse());
-          if (results.length >= count) {
-            return results.slice(0, count);
+        const txns = await EtherScan.getTxnsByAddress(args);
+        if (txns.length > 0) {
+          results = results.concat(txns.reverse());
+          if (results.length >= 2 * count) {
+            return results;
           }
         }
       } catch (err) {
