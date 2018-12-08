@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-
+const etherscan = require('./src/etherscan.js');
 const config = require('./common/config.json');
 
 const Kyber = require('./src/kyber.js');
@@ -66,4 +66,11 @@ app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
   res.status(200).send({status: "ok", results: ret});
 });
 
+app.get(config.app.path + '/currencies/:token/volume', async (req, res) => {
+    const vol = await etherscan.getVolume({token:req.params.token,startBlock:req.query.startBlock,endBlock:req.query.endBlock});
+
+  // Convert the timestamp to block numbers.
+  //onst ret = db.getTokenTradeData(token, req.query.start, req.query.stop);
+  res.status(200).send({status: "ok", results: vol});
+});
 app.listen(port, () => console.log(`app listening on ${port}`));
