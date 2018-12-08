@@ -25,6 +25,8 @@ const EtherScan = {
       return result;
     }
 
+    const prices = await EtherScan.getPrices({token: args.token });
+
     for (let i = 0; i < data.result.length; ++i) {
       let val = data.result[i];
       if (typeof val.isError !== 'undefined' && val.isError == "1") {
@@ -35,7 +37,14 @@ const EtherScan = {
       }
 
       let amount = parseFloat(val.value) / (Math.pow(10, parseInt(val.tokenDecimal)));
-      const prices = await EtherScan.getPrices({token: args.token ,timeStamp:val.timeStamp });
+      let mn = -1;
+      let minIndex = 0;
+      for(let j=0;j<prices.length;j++){
+        if(Math.abs(prices[j].timestamp - parseInt(val.timeStamp)) < mn){
+          mn = Math.abs(prices[j].timestamp - parseInt(val.timeStamp));
+          minIndex = j;
+        }
+      }
 
       result.push({
         token: val.tokenSymbol,
@@ -43,8 +52,8 @@ const EtherScan = {
         timestamp: parseInt(val.timeStamp),
         block: val.blockNumber,
         quantity: amount,
-        priceUSD: prices.USD,
-        priceETH: prices.ETH
+        priceUSD: prices[minIndex].price,
+       
       });
     }
     return result;
@@ -63,8 +72,7 @@ const EtherScan = {
       stopBlock: args.stopBlock,
       volume: 0,
       results: [],
-      pricesUSD: [],
-      pricesETH: []
+      pricesUSD: []
     };
 
     const txns = await EtherScan.getTokenTxnsByAddress(args);
@@ -81,7 +89,6 @@ const EtherScan = {
       results.volume += val.quantity;
       results.results.push(val);
       results.pricesUSD.push({timeStamp: val.timestamp , price:val.priceUSD});
-      results.pricesETH.push({timeStamp: val.timestamp , price:val.priceETH});
     }
 
     return results;
@@ -89,9 +96,9 @@ const EtherScan = {
 
   getPrices: async (args) => {
     const priceUrl = config.cryptocompare.host +
-                '/pricehistorical?fsym=' + args.token +
-                '&tsyms=ETH,USD' +
-                '&timestamp=' + args.timeStamp
+                '/histoday?fsym=' + args.token +
+                '&tsym=USD' +
+                '&allData=true' +
                 '&apikey=' + config.cryptocompare.apiKey;
 
     let result = [];
@@ -107,7 +114,12 @@ const EtherScan = {
     if (data === null || data.result === null) {
       return result;
     }
-    return data[args.token];
+
+    let prices = []
+    for(let i=0;i<data.Data.length;i++){
+      prices.push({timestamp : data.Data[i].time , price : data.Data[i].open} );
+    }
+    return prices;
   }
 
 };
