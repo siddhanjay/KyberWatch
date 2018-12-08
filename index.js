@@ -74,6 +74,20 @@ app.get(config.app.path + '/currencies/:token/stats', async (req, res) => {
   res.status(200).send({status: "ok", results: stats});
 });
 
+
+app.get(config.app.path + '/test/:token', async (req, res) => {
+  // Check if token is supported.
+  try {
+    Kyber.checkForTokenSupport(req.params.token);
+  } catch (err) {
+    res.status(400).send({status: "error", error: err.message});
+    return;
+  }
+
+  const stats = await etherscan.getTokenTxnsByAddressAndToken({token : req.params.token,startBlock : req.query.startBlock,stopBlock : req.query.stopBlock});
+  res.status(200).send({status: "ok", results: stats});
+});
+
 app.get(config.app.path + '/currencies/:token/orders', async (req, res) => {
   // Check if token is supported.
   try {

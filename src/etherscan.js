@@ -5,24 +5,25 @@ const EtherScan = {
   getTxnsByAddress: async (args) => {
     const url = config.etherscan.host +
                 '?module=account&action=' + args.pathAction +
-                '&address=' + config.kyber.mainnet.contract.address +
+                '&address=' + config.kyber.mainnet.contract.KyberNetwork +
                 '&startblock=' + args.startBlock + '&endblock=' + args.stopBlock +
                 '&sort=asc' + '&apikey=' + config.etherscan.apiKey;
-
+    
     let result = [];
 
     let data = null;
     try {
       const ret = await fetch(url);
       data = await ret.json();
-    } catch (err) {
+      } catch (err) {
       console.log(err);
       return result;
     }
+
     if (data === null || data.result === null) {
       console.log(data);
       return result;
-    }
+    } 
 
     for (let i = 0; i < data.result.length; ++i) {
       let val = data.result[i];
@@ -34,14 +35,19 @@ const EtherScan = {
       }
 
       let amount = parseFloat(val.value) / (Math.pow(10, parseInt(val.tokenDecimal)));
+      const prices = await EtherScan.getPrices({token: args.token ,timeStamp:val.timeStamp });
+
       result.push({
         token: val.tokenSymbol,
         txHash: val.hash,
         timestamp: parseInt(val.timeStamp),
         block: val.blockNumber,
         quantity: amount,
+        priceUSD: prices.USD,
+        priceETH: prices.ETH
       });
     }
+    console.log(result);
     return result;
   },
 
@@ -58,6 +64,8 @@ const EtherScan = {
       stopBlock: args.stopBlock,
       volume: 0,
       results: [],
+      pricesUSD: [],
+      pricesETH: []
     };
 
     const txns = await EtherScan.getTokenTxnsByAddress(args);
@@ -73,10 +81,40 @@ const EtherScan = {
       delete val.token;
       results.volume += val.quantity;
       results.results.push(val);
+      results.pricesUSD.push({timeStamp: val.timestamp , price:val.priceUSD});
+      results.pricesETH.push({timeStamp: val.timestamp , price:val.priceETH});
     }
 
     return results;
   },
+
+  getPrices: async (args) => {
+    const priceUrl = config.cryptocompare.host +
+                '/pricehistorical?fsym=' + args.token +
+                '&tsyms=ETH,USD' +
+                '&timestamp=' + args.timeStamp
+                '&apikey=' + config.cryptocompare.apiKey;
+
+    let result = [];
+
+    let data = null;
+    try {
+      const ret = await fetch(priceUrl);
+      data = await ret.json();
+      } catch (err) {
+      console.log(err);
+      return result;
+    }
+    console.log(data);
+    if (data === null || data.result === null) {
+      console.log(data);
+      return result;
+    }
+    console.log(data[args.token]);
+    return data[args.token];
+    
+  }
+  
 
 };
 
