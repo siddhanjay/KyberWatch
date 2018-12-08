@@ -58,8 +58,12 @@ app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
   // }
 
   // Convert the timestamp to block numbers.
-  const ret = await db.getTokenTradeData(req.params.token, parseInt(req.query.start), parseInt(req.query.stop));
-  res.status(200).send({status: "ok", results: ret});
+  try {
+    const ret = await db.getTokenTradeData(req.params.token, parseInt(req.query.start), parseInt(req.query.stop));
+    res.status(200).send({status: "ok", results: ret});
+  } catch (err) {
+    res.status(500).send({status: "error", error: err.message});
+  }
 });
 
 // Returns the most recent market stats of the token
@@ -72,8 +76,12 @@ app.get(config.app.path + '/currencies/:token/stats', async (req, res) => {
     return;
   }
 
-  const stats = await Kyber.getTokenStats(req.params.token);
-  res.status(200).send({status: "ok", results: stats});
+  try {
+    const stats = await Kyber.getTokenStats(req.params.token);
+    res.status(200).send({status: "ok", results: stats});
+  } catch (err) {
+    res.status(500).send({status: "error", error: err.message});
+  }
 });
 
 app.get(config.app.path + '/test/:token', async (req, res) => {
@@ -105,8 +113,12 @@ app.get(config.app.path + '/test/:token', async (req, res) => {
 
 // Returns a list of the most recent orders in Kyber
 app.get(config.app.path + '/currencies/orders', async (req, res) => {
-  const orders = await Kyber.getLastOrders(req.query.count);
-  res.status(200).send({status: "ok", results: orders});
+  try {
+    const orders = await Kyber.getLastOrders(req.query.count);
+    res.status(200).send({status: "ok", results: orders});
+  } catch (err) {
+    res.status(500).send({status: "error", error: err.message});
+  }
 });
 
 app.listen(port, () => console.log(`app listening on ${port}`));

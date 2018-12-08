@@ -6,11 +6,13 @@ $(document).ready(function() {
         hour24Low  = $('#24hourlow'),
         lastTraded = $('#lasttraded');
 
-  const host = '/api/v1/kyber/currencies';
-
   const orderTableBody = $('#token-orders-table');
 
-  const tokenPricesTable = $('#token-prices-table');
+  const tokenPriceGraph = $('#token-price-graph');
+
+  const metamask = $('#connect-metamask');
+
+  const host = '/api/v1/kyber/currencies';
 
   const Token = {
     load: () => {
@@ -41,6 +43,7 @@ $(document).ready(function() {
     },
 
     loadStats: (token) => {
+      console.log(token);
       $.get({
         url: host + '/' + token + '/stats',
         success: (response) => {
@@ -125,12 +128,12 @@ $(document).ready(function() {
             }
           }
 
-          Highcharts.stockChart('token-prices-table', {
+          Highcharts.stockChart('token-prices-graph', {
             rangeSelector: {
               selected: 1
             },
             title: {
-              text: 'AAAP'
+              text: ''
             },
             yAxis: [{
               labels: {
@@ -177,9 +180,37 @@ $(document).ready(function() {
 
     reset: () => {
 
-    },
+    }
   };
   Token.load();
-  Token.loadGraph('DAI');
+  Token.loadGraph(tokenList.val());
 
+  // Keep refreshing the Token stats.
+  //setInterval(() => Token.loadStats(tokenList.val()), 1000);
+
+  const Metamask = {
+    getWeb3: () => {
+      return new Promise((resolve, reject) => {
+        if (ethereum) {
+          web3 = new Web3(ethereum);
+
+          ethereum.enable()
+            .then(() => resolve(null))
+            .catch((err) => reject(err.message));
+        } else if (web3) {
+          reject('Legacy dapp browser detected. Update!');
+        } else {
+          reject('Non-Ethereum browser detected. Use MetaMask!');
+        }
+      });
+    },
+
+  };
+
+  metamask.on('click', () => {
+    Metamask.getWeb3().then(() => {
+      metamask.fadeOut();
+      web3.eth.getAccounts().then(e => console.log(e));
+    });
+  });
 });

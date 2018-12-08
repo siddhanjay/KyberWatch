@@ -156,3 +156,10 @@ status.gradient.info {
     border-radius: 0px !important;
     transition: all 0.3s ease-in-out;
 }
+
+#connect-metamask {
+  width: 100px;
+  float:right;
+  margin-right:12px;
+  margin-top: 12px;
+}
