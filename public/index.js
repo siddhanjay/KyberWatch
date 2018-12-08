@@ -32,7 +32,6 @@ $(document).ready(function() {
           tokenList.on('change', (e) => {
             tokenList.prop('disabled', true);
             Token.loadStats(e.target.value);
-            Token.loadOrders(e.target.value);
             tokenList.prop('disabled', false);
           });
         },
@@ -59,24 +58,28 @@ $(document).ready(function() {
       });
     },
 
-    loadOrders: (token) => {
-      console.log('loading orders of ' + token);
+    loadOrders: () => {
       $.get({
-        url: host + '/' + token + '/orders',
+        url: host + '/orders',
         data: {
           "count": 5
         },
         success: (response) => {
-          let html = '';
           if (response && response.results && response.results.length > 0) {
+            let map = {};
             for (let i = 0; i < response.results.length; ++i) {
               const val = response.results[i];
-              html += '<tr><td>' + val.txHash + '</td><td>' + val.quantity + '</td><td>' + new Date(1000 * val.timestamp).toDateString();
+              const key = val.token + val.quantity;
+              if (key in map) {
+                continue;
+              }
+              map[key] = 1;
+              html = '<tr><td>' + val.token + '</td><td>' + val.quantity + '</td><td>' + new Date(1000 * val.timestamp).toDateString();
               html += '</td><td>' + val.block + '</td><td>';
               html += '<a href="https://etherscan.io/tx/' + val.txHash + '" target="_blank">Link</a></td></tr>';
+              orderTableBody.append(html);
             }
           }
-          orderTableBody.html(html);
         },
         error: (err) => {
           console.log(err);
