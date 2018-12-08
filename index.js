@@ -9,7 +9,7 @@ const DB = require('./src/db.js');
 const db = new DB();
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 80;
 
 app.use(cors());
 app.use(express.json());
@@ -27,6 +27,7 @@ app.get(config.app.path + '/currencies', async (req, res) => {
   res.status(200).send({status: "ok", results: currencies});
 });
 
+// Returns a lost of trades in the given token
 app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
   // Check if token is supported.
   try {
@@ -61,6 +62,7 @@ app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
   res.status(200).send({status: "ok", results: ret});
 });
 
+// Returns the most recent market stats of the token
 app.get(config.app.path + '/currencies/:token/stats', async (req, res) => {
   // Check if token is supported.
   try {
@@ -74,6 +76,7 @@ app.get(config.app.path + '/currencies/:token/stats', async (req, res) => {
   res.status(200).send({status: "ok", results: stats});
 });
 
+// Returns a list of the most recent orders in Kyber
 app.get(config.app.path + '/currencies/orders', async (req, res) => {
   const orders = await Kyber.getLastOrders(req.query.count);
   res.status(200).send({status: "ok", results: orders});
