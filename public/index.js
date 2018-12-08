@@ -98,30 +98,30 @@ $(document).ready(function() {
         },
         success: (response) => {
           console.log(response);
-          
+
           let prices_ETH = [];
           let prices_USD = [];
           let volume = [];
-          for (let i = 0; i < response.length; ++i) {
-            if (response[i].priceETH && response[i].priceETH > 0) {
-              prices_ETH.push({
-                timestamp: response[i].timeStamp,
-                priceETH: response[i].priceETH
-              });
+          for (let i = 0; i < response.results.length; ++i) {
+            if (response.results[i].price_eth && response.results[i].price_eth > 0) {
+              prices_ETH.push([
+                response.results[i].timestamp * 1000,
+                response.results[i].price_eth
+              ]);
             }
 
-            if (response[i].priceUSD && response[i].priceUSD > 0) {
-              prices_USD.push({
-                timestamp: response[i].timeStamp,
-                priceUSD: response[i].priceUSD
-              });
+            if (response.results[i].price_usd && response.results[i].price_usd > 0) {
+              prices_USD.push([
+                response.results[i].timestamp * 1000,
+                response.results[i].price_usd
+              ]);
             }
 
-            if (response[i].quantity && response[i].quantity > 0) {
-              volume.push({
-                timestamp: response[i].timeStamp,
-                volume: response[i].quantity
-              });
+            if (response.results[i].quantity && response.results[i].quantity > 0) {
+              volume.push([
+                response.results[i].timestamp * 1000,
+                response.results[i].quantity
+              ]);
             }
           }
 
@@ -130,31 +130,46 @@ $(document).ready(function() {
               selected: 1
             },
             title: {
-              text: ''
+              text: 'AAAP'
             },
-            series: [
-              {
-                name: 'volume',
-                data: volume,
-                tooltip: {
-                  valueDecimals: 2
-                }
+            yAxis: [{
+              labels: {
+                align: 'right',
+                x: -3
               },
-              {
-                name: 'Price in ETH',
-                data: prices_ETH,
-                tooltip: {
-                  valueDecimals: 2
-                }
+              title: {
+                text: 'Price Against USD'
               },
-              {
-                name: 'Price in USD',
-                data: prices_USD,
-                tooltip: {
-                  valueDecimals: 2
-                }
+              height: '60%',
+              lineWidth: 2,
+              resize: {
+                enabled: true
+              }
+            }, {
+              labels: {
+                align: 'right',
+                x: -3
               },
-            ]
+              title: {
+                text: 'Volume'
+              },
+              top: '65%',
+              height: '35%',
+              offset: 0,
+              lineWidth: 2
+            }],
+            tooltip: {
+              split: true
+            },
+            series: [{
+              name: 'Price against USD',
+              data: prices_USD,
+            },{
+              type: 'column',
+              name: 'Volume',
+              data: volume,
+              yAxis: 1,
+            }],
           });
         },
       });
