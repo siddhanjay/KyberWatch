@@ -9,7 +9,7 @@ const DB = require('./src/db.js');
 const db = new DB();
 
 const app = express();
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
@@ -74,4 +74,17 @@ app.get(config.app.path + '/currencies/:token/stats', async (req, res) => {
   res.status(200).send({status: "ok", results: stats});
 });
 
-app.listen(port, async () => console.log(`app listening on ${port}`));
+app.get(config.app.path + '/currencies/:token/orders', async (req, res) => {
+  // Check if token is supported.
+  try {
+    Kyber.checkForTokenSupport(req.params.token);
+  } catch (err) {
+    res.status(400).send({status: "error", error: err.message});
+    return;
+  }
+
+  const orders = await Kyber.getTokenLastOrders(req.params.token, req.query.count);
+  res.status(200).send({status: "ok", results: orders});
+});
+
+app.listen(port, () => console.log(`app listening on ${port}`));

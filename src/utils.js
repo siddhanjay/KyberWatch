@@ -15,18 +15,24 @@ const getLastBlockBeforeTimestamp = async (currentBlock, timestamp) => {
       lastBlockTimestamp = (await web3.eth.getBlock(lastBlock)).timestamp;
     } catch (err) {
       console.log(err);
+      break;
     }
     if (lastBlockTimestamp > timestamp) {
       diffBlocks = Math.floor((lastBlockTimestamp - timestamp) / 15);
       diffBlocks = diffBlocks == 0 ? 1 : diffBlocks;
       lastBlock -= diffBlocks;
     } else {
-      const nextBlockTimestamp = (await web3.eth.getBlock(lastBlock + 1)).timestamp;
-      if (nextBlockTimestamp >= timestamp) {
-        lastBlock = (nextBlockTimestamp === timestamp) ? lastBlock + 1 : lastBlock;
+      try {
+        const nextBlockTimestamp = (await web3.eth.getBlock(lastBlock + 1)).timestamp;
+        if (nextBlockTimestamp >= timestamp) {
+          lastBlock = (nextBlockTimestamp === timestamp) ? lastBlock + 1 : lastBlock;
+          break;
+        }
+        ++lastBlock;
+      } catch (err) {
+        console.log(err.message);
         break;
       }
-      ++lastBlock;
     }
   } while (true);
 

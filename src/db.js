@@ -52,7 +52,6 @@ class DB {
         continue;
       }
       if (txns === null || txns.results === null || txns.results.length === 0) {
-        console.log('unable to find any transactions!');
         continue;
       }
 
