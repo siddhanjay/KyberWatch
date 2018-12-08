@@ -114,7 +114,7 @@ app.get(config.app.path + '/test/:token', async (req, res) => {
 // Returns a list of the most recent orders in Kyber
 app.get(config.app.path + '/currencies/orders', async (req, res) => {
   try {
-    const orders = await Kyber.getLastOrders(req.query.count);
+    const orders = await Kyber.getLastOrders(parseInt(req.query.count));
     res.status(200).send({status: "ok", results: orders});
   } catch (err) {
     res.status(500).send({status: "error", error: err.message});

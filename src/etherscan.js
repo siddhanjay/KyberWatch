@@ -15,13 +15,11 @@ const EtherScan = {
     try {
       const ret = await fetch(url);
       data = await ret.json();
-      } catch (err) {
-      console.log(err);
+    } catch (err) {
       return result;
     }
 
     if (data === null || data.result === null) {
-      console.log(data);
       return result;
     }
 
@@ -29,7 +27,7 @@ const EtherScan = {
 
     for (let i = 0; i < data.result.length; ++i) {
       let val = data.result[i];
-      if (typeof val.isError !== 'undefined' && val.isError == "1") {
+      if (typeof val.isError !== 'undefined' && val.isError === "1") {
         continue;
       }
       if (val.tokenSymbol === '') {
@@ -46,16 +44,27 @@ const EtherScan = {
         }
       }
 
-      result.push({
-        token: val.tokenSymbol,
-        txHash: val.hash,
-        timestamp: parseInt(val.timeStamp),
-        block: val.blockNumber,
-        quantity: amount,
-        priceUSD: prices[minIndex].price,
-       
-      });
+      try {
+        result.push({
+          token: val.tokenSymbol,
+          txHash: val.hash,
+          timestamp: parseInt(val.timeStamp),
+          block: val.blockNumber,
+          quantity: amount,
+          priceUSD: prices[minIndex].price,
+        });
+      } catch (err) {
+        result.push({
+          token: val.tokenSymbol,
+          txHash: val.hash,
+          timestamp: parseInt(val.timeStamp),
+          block: val.blockNumber,
+          quantity: amount,
+          priceUSD: 0,
+        });
+      }
     }
+
     return result;
   },
 
@@ -115,7 +124,7 @@ const EtherScan = {
       return result;
     }
 
-    let prices = []
+    let prices = [];
     for(let i=0;i<data.Data.length;i++){
       prices.push({timestamp : data.Data[i].time , price : data.Data[i].open} );
     }

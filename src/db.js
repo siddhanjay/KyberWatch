@@ -86,14 +86,18 @@ class DB {
     console.log('finished writing everything to DB');
   }
 
-  async getTokenTradeData(token, start, stop) {
+  async getTokenTradeData(token, start, stop, skip) {
+    skip = false;
+
     // Find the data that is present in the DB within this timestamp.
     const getQuery = () => {
       return new Promise((resolve, reject) => {
+        const sqlQuery = 'SELECT *, UNIX_TIMESTAMP(timestamp) as timestamp  FROM `token_trades` WHERE token = ? AND `timestamp` BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?) ' +
+         'ORDER BY `timestamp` DESC';
         this.connection.query({
-          sql: 'SELECT *, UNIX_TIMESTAMP(timestamp) as timestamp  FROM `token_trades` WHERE `timestamp` BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?) ORDER BY `timestamp` DESC',
+          sql: sqlQuery,
           timeout: 4000, // 4s
-          values: [start, stop],
+          values: [token, start, stop],
         }, (error, results, fields) => {
           if (error) {
             reject(error);
@@ -104,33 +108,35 @@ class DB {
       });
     };
 
-    console.log(`trying to retrieve the trade data between ${start} and ${stop}`);
-    const results = await getQuery();
-    if (results && results.length > 0) {
-      console.log('Found in DB');
+    if (!skip) {
+      console.log(`trying to retrieve the trade data between ${start} and ${stop}`);
+      const results = await getQuery();
+      if (results && results.length > 0) {
+        console.log('Found in DB');
 
-      const lastBlockTimestamp = results[0].timestamp;
-      if (stop > lastBlockTimestamp) {
-        // get blocks from (lastBlockTimestamp + 1, stop)
-        const blocks = await Utils.getBlocksBetweenTimestamps(lastBlockTimestamp + 1, stop);
-        await this.retrieveAndInsert(token, blocks);
-      }
-
-      if (results.length > 1) {
-        const firstBlockTimestamp = results[results.length - 1].timestamp;
-        if (firstBlockTimestamp > start) {
-          // get blocks from (start, firstBlockTimestamp - 1)
-          const blocks = await Utils.getBlocksBetweenTimestamps(start, firstBlockTimestamp - 1);
+        const lastBlockTimestamp = results[0].timestamp;
+        if (stop > lastBlockTimestamp) {
+          // get blocks from (lastBlockTimestamp + 1, stop)
+          const blocks = await Utils.getBlocksBetweenTimestamps(lastBlockTimestamp + 1, stop);
           await this.retrieveAndInsert(token, blocks);
         }
-      }
-    } else {
-      // get blocks from (start, stop) from blockchain
-      console.log('Not in DB. Dig into Blockchain');
-      const blocks = await Utils.getBlocksBetweenTimestamps(start, stop);
 
-      console.log(`Blocks between ${blocks.startBlock} and ${blocks.stopBlock} to be retrieved`);
-      await this.retrieveAndInsert(token, blocks);
+        if (results.length > 1) {
+          const firstBlockTimestamp = results[results.length - 1].timestamp;
+          if (firstBlockTimestamp > start) {
+            // get blocks from (start, firstBlockTimestamp - 1)
+            const blocks = await Utils.getBlocksBetweenTimestamps(start, firstBlockTimestamp - 1);
+            await this.retrieveAndInsert(token, blocks);
+          }
+        }
+      } else {
+        // get blocks from (start, stop) from blockchain
+        console.log('Not in DB. Dig into Blockchain');
+        const blocks = await Utils.getBlocksBetweenTimestamps(start, stop);
+
+        console.log(`Blocks between ${blocks.startBlock} and ${blocks.stopBlock} to be retrieved`);
+        await this.retrieveAndInsert(token, blocks);
+      }
     }
 
     const newResults = await getQuery();
