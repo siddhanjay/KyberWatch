@@ -70,7 +70,7 @@ const Kyber = {
         if (txns.length > 0) {
           results = results.concat(txns.reverse());
           if (results.length >= 2 * count) {
-            return results.slice(0, 2 * count);
+            return results;
           }
         }
       } catch (err) {

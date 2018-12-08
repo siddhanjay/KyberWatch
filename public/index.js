@@ -62,19 +62,19 @@ $(document).ready(function() {
       $.get({
         url: host + '/orders',
         data: {
-          "count": 5
+          "count": 10
         },
         success: (response) => {
           if (response && response.results && response.results.length > 0) {
             let map = {};
             for (let i = 0; i < response.results.length; ++i) {
               const val = response.results[i];
-              const key = val.token + val.quantity;
+              const key = val.token + val.timestamp;
               if (key in map) {
                 continue;
               }
               map[key] = 1;
-              html = '<tr><td>' + val.token + '</td><td>' + val.quantity + '</td><td>' + new Date(1000 * val.timestamp).toDateString();
+              html = '<tr><td>' + val.token + '</td><td>' + val.quantity + '</td><td>' + new Date(1000 * val.timestamp).toISOString();
               html += '</td><td>' + val.block + '</td><td>';
               html += '<a href="https://etherscan.io/tx/' + val.txHash + '" target="_blank">Link</a></td></tr>';
               orderTableBody.append(html);
