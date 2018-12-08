@@ -15,7 +15,7 @@ class DB {
     this.connection.connect();
   }
 
-  retrieveAndInsert(blocks) {
+  async retrieveAndInsert(blocks) {
     const insertQuery = (args) => {
       this.connection.query({
         sql: 'INSERT INTO token_trades(token, timestamp, quantity, price, block) VALUES(?,?,?,?,?)',
@@ -63,19 +63,19 @@ class DB {
       if (stop > lastBlockTimestamp) {
         // get blocks from (lastBlockTimestamp + 1, stop)
         const blocks = await Utils.getBlocksBetweenTimestamps(lastBlockTimestamp + 1, stop);
-        retrieveAndInsert(blocks);
+        await retrieveAndInsert(blocks);
       }
 
       const firstBlockTimestamp = results[results.length - 1].timestamp;
       if (start < firstBlockTimestamp) {
         // get blocks from (start, firstBlockTimestamp - 1)
         const blocks = await Utils.getBlocksBetweenTimestamps(start, firstBlockTimestamp - 1);
-        retrieveAndInsert(blocks);
+        await retrieveAndInsert(blocks);
       }
     } else {
       // get blocks from (start, stop) from blockchain
       const blocks = await Utils.getBlocksBetweenTimestamps(start, stop);
-      retrieveAndInsert(blocks);
+      await retrieveAndInsert(blocks);
     }
 
     const newResults = await getQuery();

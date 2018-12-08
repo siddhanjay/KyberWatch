@@ -74,6 +74,4 @@ app.get(config.app.path + '/currencies/:token/stats', async (req, res) => {
   res.status(200).send({status: "ok", results: stats});
 });
 
-
-
 app.listen(port, () => console.log(`app listening on ${port}`));
