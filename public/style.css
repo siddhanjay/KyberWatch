@@ -33,6 +33,14 @@ h4 {
   border-bottom: 1px solid #e9eaec;
 }
 
+#logo {
+  font-family: 'Pacifico', cursive;
+  font-size: 30px;
+  margin-left: 10px;
+  margin-top: 5px;
+  float:left;
+}
+
 #nav-bar {
   background-color: #223143;
   color: #99abb4;

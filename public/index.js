@@ -101,7 +101,7 @@ $(document).ready(function() {
       $.get({
         url: host + '/' + token + '/trades',
         data: {
-          "start": "1514233022",
+          "start": "1542033022",
           "stop": "1544253022",
         },
         success: (response) => {
