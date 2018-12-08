@@ -3,7 +3,6 @@ const fetch = require('node-fetch');
 
 const EtherScan = {
   getTxnsByAddress: async (args) => {
-    txlistinternal
     const url = config.etherscan.host +
                 '?module=account&action=' + args.pathAction +
                 '&address=' + config.kyber.mainnet.contract.address +
@@ -27,7 +26,7 @@ const EtherScan = {
 
     for (let i = 0; i < data.result.length; ++i) {
       let val = data.result[i];
-      if (typeof val.isError !== 'undefined' && val.isError === "1") {
+      if (typeof val.isError !== 'undefined' && val.isError == "1") {
         continue;
       }
       if (val.tokenSymbol === '') {
@@ -47,7 +46,7 @@ const EtherScan = {
   },
 
   getTokenTxnsByAddress: async (args) => {
-    args.pathAction = 'tokentx';
+    args.pathAction = (typeof args.token !== 'undefined' && args.token === 'ETH') ? 'txlistinternal': 'tokentx';
     const result = await getTxnsByAddress(args);
     return result;
   },
@@ -66,7 +65,7 @@ const EtherScan = {
       return results;
     }
 
-    for (let i = 0; i < txns.length; ++i) {
+    for (let i = 0; i < txns.length; i += 2) {
       const val = txns[i];
       if (val.token !== args.token) {
         continue;
@@ -74,58 +73,6 @@ const EtherScan = {
       delete val.token;
       results.volume += val.quantity;
       results.results.push(val);
-    }
-
-    return results;
-  },
-
-  getEthTxnsByAddress: async (args) => {
-    args.pathAction = 'txlistinternal';
-    let results = {
-      token: 'ETH',
-      startBlock: args.startBlock,
-      endBlock: args.endBlock,
-      volume: 0,
-      results: [],
-    };
-
-    const txns = await getTxnsByAddress(args);
-    if (txns === null || txns.length === 0) {
-      return results;
-    }
-
-    for (let i = 0; i < txns.length; ++i) {
-      const val = txns[i];
-      results.volume += val.quantity;
-      results.results.push(val);
-    }
-
-    return results;
-  },
-
-  getVolume : async (args) => {
-    let results = [];
-
-    if (args.token === "ETH") {
-      const ethtxns = await EtherScan.getEthTxnsByAddressAndToken(args);
-      for (let i = 0; i < ethtxns.results.length; i += 2) {
-        const val = ethtxns.results[i];
-        let result = {
-          timestamp: val.timestamp,
-          volume: val.quantity
-        };
-        results.push(result);
-      }
-    } else {
-      const txns = await EtherScan.getTokenTxnsByAddressAndToken(args);
-      for (let i = 0; i < txns.results.length; i += 2) {
-        const val = txns.results[i];
-        let result = {
-          timeStamp: val.timestamp,
-          volume: val.quantity
-        };
-        results.push(result);
-      }
     }
 
     return results;
