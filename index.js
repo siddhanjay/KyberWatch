@@ -9,7 +9,7 @@ const DB = require('./src/db.js');
 const db = new DB();
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 80;
 
 app.use(cors());
 app.use(express.json());

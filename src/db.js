@@ -3,7 +3,6 @@ const Utils = require('./utils.js');
 const EtherScan = require('./etherscan.js');
 
 const mysql = require('mysql');
-const moment = require('moment');
 
 class DB {
   constructor() {
@@ -23,8 +22,6 @@ class DB {
 
     const insertQuery = (args) => {
       return new Promise((resolve, reject) => {
-        const timestamp =
-
         this.connection.query({
           sql: 'INSERT INTO token_trades(token, timestamp, quantity, price, block) VALUES(?,FROM_UNIXTIME(?),?,?,?)',
           timeout: 4000, // 4s
@@ -79,7 +76,7 @@ class DB {
     const getQuery = () => {
       return new Promise((resolve, reject) => {
         this.connection.query({
-          sql: 'SELECT * FROM `token_trades` WHERE `timestamp` BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?) ORDER BY `timestamp` DESC',
+          sql: 'SELECT *, UNIX_TIMESTAMP(timestamp) as timestamp  FROM `token_trades` WHERE `timestamp` BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?) ORDER BY `timestamp` DESC',
           timeout: 4000, // 4s
           values: [start, stop],
         }, (error, results, fields) => {
@@ -97,18 +94,20 @@ class DB {
     if (results && results.length > 0) {
       console.log('Found in DB');
 
-      const lastBlockTimestamp = moment(results[0].timestamp, 'YYYY-MM-DD hh:mm:ss').unix();
+      const lastBlockTimestamp = results[0].timestamp;
       if (stop > lastBlockTimestamp) {
         // get blocks from (lastBlockTimestamp + 1, stop)
         const blocks = await Utils.getBlocksBetweenTimestamps(lastBlockTimestamp + 1, stop);
         await this.retrieveAndInsert(token, blocks);
       }
 
-      const firstBlockTimestamp = moment(results[results.length - 1].timestamp, 'YYYY-MM-DD hh:mm:ss').unix();;
-      if (start < firstBlockTimestamp) {
-        // get blocks from (start, firstBlockTimestamp - 1)
-        const blocks = await Utils.getBlocksBetweenTimestamps(start, firstBlockTimestamp - 1);
-        await this.retrieveAndInsert(token, blocks);
+      if (results.length > 1) {
+        const firstBlockTimestamp = results[results.length - 1].timestamp;
+        if (start < firstBlockTimestamp) {
+          // get blocks from (start, firstBlockTimestamp - 1)
+          const blocks = await Utils.getBlocksBetweenTimestamps(start, firstBlockTimestamp - 1);
+          await this.retrieveAndInsert(token, blocks);
+        }
       }
     } else {
       // get blocks from (start, stop) from blockchain
