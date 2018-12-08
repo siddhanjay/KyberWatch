@@ -10,6 +10,8 @@ $(document).ready(function() {
 
   const orderTableBody = $('#token-orders-table');
 
+  const tokenPricesTable = $('#token-prices-table');
+
   const Token = {
     load: () => {
       $.get({
@@ -86,7 +88,83 @@ $(document).ready(function() {
         },
       });
     },
+
+    loadGraph: (token) => {
+      $.get({
+        url: host + '/' + token + '/trades',
+        data: {
+          "start": "1544233022",
+          "stop": "1544253022",
+        },
+        success: (response) => {
+          console.log(response);
+          
+          let prices_ETH = [];
+          let prices_USD = [];
+          let volume = [];
+          for (let i = 0; i < response.length; ++i) {
+            if (response[i].priceETH && response[i].priceETH > 0) {
+              prices_ETH.push({
+                timestamp: response[i].timeStamp,
+                priceETH: response[i].priceETH
+              });
+            }
+
+            if (response[i].priceUSD && response[i].priceUSD > 0) {
+              prices_USD.push({
+                timestamp: response[i].timeStamp,
+                priceUSD: response[i].priceUSD
+              });
+            }
+
+            if (response[i].quantity && response[i].quantity > 0) {
+              volume.push({
+                timestamp: response[i].timeStamp,
+                volume: response[i].quantity
+              });
+            }
+          }
+
+          Highcharts.stockChart('token-prices-table', {
+            rangeSelector: {
+              selected: 1
+            },
+            title: {
+              text: ''
+            },
+            series: [
+              {
+                name: 'volume',
+                data: volume,
+                tooltip: {
+                  valueDecimals: 2
+                }
+              },
+              {
+                name: 'Price in ETH',
+                data: prices_ETH,
+                tooltip: {
+                  valueDecimals: 2
+                }
+              },
+              {
+                name: 'Price in USD',
+                data: prices_USD,
+                tooltip: {
+                  valueDecimals: 2
+                }
+              },
+            ]
+          });
+        },
+      });
+    },
+
+    reset: () => {
+
+    },
   };
   Token.load();
+  Token.loadGraph('DAI');
 
 });

@@ -8,7 +8,7 @@ const EtherScan = {
                 '&address=' + config.kyber.mainnet.contract.KyberNetwork +
                 '&startblock=' + args.startBlock + '&endblock=' + args.stopBlock +
                 '&sort=asc' + '&apikey=' + config.etherscan.apiKey;
-    
+
     let result = [];
 
     let data = null;
@@ -23,7 +23,7 @@ const EtherScan = {
     if (data === null || data.result === null) {
       console.log(data);
       return result;
-    } 
+    }
 
     for (let i = 0; i < data.result.length; ++i) {
       let val = data.result[i];
@@ -47,7 +47,6 @@ const EtherScan = {
         priceETH: prices.ETH
       });
     }
-    console.log(result);
     return result;
   },
 
@@ -101,20 +100,15 @@ const EtherScan = {
     try {
       const ret = await fetch(priceUrl);
       data = await ret.json();
-      } catch (err) {
-      console.log(err);
+    } catch (err) {
       return result;
     }
-    console.log(data);
+
     if (data === null || data.result === null) {
-      console.log(data);
       return result;
     }
-    console.log(data[args.token]);
     return data[args.token];
-    
   }
-  
 
 };
 

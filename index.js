@@ -9,7 +9,7 @@ const DB = require('./src/db.js');
 const db = new DB();
 
 const app = express();
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
@@ -76,7 +76,6 @@ app.get(config.app.path + '/currencies/:token/stats', async (req, res) => {
   res.status(200).send({status: "ok", results: stats});
 });
 
-
 app.get(config.app.path + '/test/:token', async (req, res) => {
   // Check if token is supported.
   try {
@@ -86,10 +85,23 @@ app.get(config.app.path + '/test/:token', async (req, res) => {
     return;
   }
 
-  const stats = await etherscan.getTokenTxnsByAddressAndToken({token : req.params.token,startBlock : req.query.startBlock,stopBlock : req.query.stopBlock});
+  // Check for missing parameters.
+  if (typeof req.query.startBlock === 'undefined') {
+    res.status(400).send({status: "error", error: "missing start block"});
+    return;
+  }
+  if (typeof req.query.stopBlock === 'undefined') {
+    res.status(400).send({status: "error", error: "missing stop block"});
+    return;
+  }
+
+  const stats = await etherscan.getTokenTxnsByAddressAndToken({
+    token: req.params.token,
+    startBlock: req.query.startBlock,
+    stopBlock: req.query.stopBlock
+  });
   res.status(200).send({status: "ok", results: stats});
 });
-
 
 // Returns a list of the most recent orders in Kyber
 app.get(config.app.path + '/currencies/orders', async (req, res) => {

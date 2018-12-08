@@ -23,9 +23,9 @@ class DB {
     const insertQuery = (args) => {
       return new Promise((resolve, reject) => {
         this.connection.query({
-          sql: 'INSERT INTO token_trades(token, timestamp, quantity, price, block) VALUES(?,FROM_UNIXTIME(?),?,?,?)',
+          sql: 'INSERT INTO token_trades(token, timestamp, quantity, price_eth, price_usd, block) VALUES(?,FROM_UNIXTIME(?),?,?,?,?)',
           timeout: 4000, // 4s
-          values: [args.token, args.timestamp, args.quantity, args.price, args.block],
+          values: [args.token, args.timestamp, args.quantity, args.price_eth, args.price_usd, args.block],
         }, (error, results, field) => {
           if (error) {
             console.log('failed to insert into DB');
@@ -57,11 +57,27 @@ class DB {
 
       console.log('inserting ' + txns.results.length + ' into the DB');
       for (let i = 0; i < txns.results.length; ++i) {
-        const args = {
+        let args = {
+          token: txns.token,
+          timestamp: txns.results[i].timestamp,
+        };
+
+        let price = null;
+        try {
+          price = await EtherScan.getPrices(args);
+        } catch (err) {
+          price = {ETH:-1, USD:-1};
+        }
+        if (price === null) {
+          price = {ETH:-1, USD:-1};
+        }
+
+        args = {
           token: txns.token,
           timestamp: txns.results[i].timestamp,
           quantity: txns.results[i].quantity,
-          price: 1,
+          price_eth: price.ETH,
+          price_usd: price.USD,
           block: txns.results[i].block
         };
         await insertQuery(args);
@@ -102,7 +118,7 @@ class DB {
 
       if (results.length > 1) {
         const firstBlockTimestamp = results[results.length - 1].timestamp;
-        if (start < firstBlockTimestamp) {
+        if (firstBlockTimestamp > start) {
           // get blocks from (start, firstBlockTimestamp - 1)
           const blocks = await Utils.getBlocksBetweenTimestamps(start, firstBlockTimestamp - 1);
           await this.retrieveAndInsert(token, blocks);

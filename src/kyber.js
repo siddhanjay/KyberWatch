@@ -52,13 +52,8 @@ const Kyber = {
       throw err;
     }
   },
-<<<<<<< HEAD
-  
-  getTokenLastOrders: async (token, count) => {
-=======
 
   getLastOrders: async (count) => {
->>>>>>> db1621ae6dcd9500222b5d9be145ac3c4d7530e4
     currentBlock = await web3.eth.getBlockNumber();
 
     let results = [];
