@@ -66,4 +66,22 @@ app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
   res.status(200).send({status: "ok", results: ret});
 });
 
+app.get(config.app.path + '/currencies/:token/stats', async (req, res) => {
+  // Check if token is supported.
+  let token = null;
+  try {
+    token = req.params.token;
+    const supportedCurrencies = await Kyber.getSupportedCurrencies();
+    if (supportedCurrencies.indexOf(token) === -1) {
+      throw new Error('Token is not supported by Kyber');
+    }
+  } catch (err) {
+    res.status(400).send({status: "error", error: err.message});
+    return;
+  }
+
+  const stats = await Kyber.getTokenStats(token);
+  res.status(200).send({status: "ok", results: stats});
+});
+
 app.listen(port, () => console.log(`app listening on ${port}`));

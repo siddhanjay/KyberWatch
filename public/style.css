@@ -1,0 +1,158 @@
+html, html a, body {
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: #04a1f4;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  font-size: 14px;
+  background-color: #f7fbff !important;
+  color: #8a8a8a;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+h4 {
+    font-size: 19px;
+}
+
+#header {
+  display: block;
+  height: 65px;
+  width: 100%;
+  position: fixed;
+  padding: 0px;
+  z-index: 1040;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e9eaec;
+}
+
+#nav-bar {
+  background-color: #223143;
+  color: #99abb4;
+  width: 250px;
+  z-index: 1000;
+  top: 65px;
+  bottom: 0px;
+  position: fixed;
+  overflow: hidden;
+}
+
+#main-content {
+  padding: calc(65px + 35px) 15px 15px 15px;
+  min-height: calc(100vh - 65px);
+  display: block;
+}
+
+.page-container {
+    min-height: 100vh;
+    padding-left: 250px;
+}
+
+.card-header:first-child {
+    border-radius: 0px;
+}
+
+.card-header {
+    padding: 15px 25px !important;
+    position: relative !important;
+    background-color: transparent !important;
+    border-bottom: 0px !important;
+    min-height: 55px !important;
+}
+
+.card-body {
+    padding: 25px;
+    position: relative;
+}
+
+.card-header .card-title {
+    margin-bottom: 0px;
+    display: inline-block;
+}
+.card-title {
+    color: #515365;
+    margin-top: 0px;
+    margin-bottom: 15px;
+}
+
+.card-toolbar {
+    float: right;
+}
+
+.card-toolbar ul {
+    list-style: none;
+    padding-left: 0px;
+}
+
+ul {
+    margin-bottom: 0px;
+}
+
+.card-toolbar ul > li {
+    display: inline-block;
+}
+
+.card-toolbar ul > li > a, .card-toolbar ul > li > .btn {
+    margin-bottom: 0px;
+    margin-right: 10px;
+    display: block;
+}
+
+.text-gray {
+    color: #8a8a8a !important;
+}
+
+m-t-10 {
+    margin-top: 10px !important;
+}
+status.gradient.info {
+    background: linear-gradient(120deg, #6a4ee1 0%, #05bdd7 100%);
+}
+.status.gradient {
+    border: 0px;
+    background: #fafafa;
+}
+.status.info {
+    border-color: #04a1f4;
+}
+.status {
+    width: 10px;
+    height: 10px;
+    background-color: #ffffff;
+    border-radius: 50px;
+    border: 3px solid;
+    border-color: #c0c3c9;
+    display: inline-block;
+}
+
+.progress {
+    height: 6px !important ;
+    background-color: #ececec;
+    border-radius: 50px;
+    margin-bottom: 20px;
+}
+
+.progress-bar:last-child {
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+}
+
+.m-t-15 {
+    margin-top: 15px !important;
+}
+
+.card {
+    position: relative;
+    background-color: #ffffff !important;
+    margin-bottom: 30px !important;
+    border: 1px solid #e9eaec !important;
+    border-radius: 0px !important;
+    transition: all 0.3s ease-in-out;
+}
