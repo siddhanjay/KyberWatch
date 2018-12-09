@@ -126,7 +126,7 @@ const EtherScan = {
 
     let prices = [];
     for(let i=0;i<data.Data.length;i++){
-      prices.push({timestamp : data.Data[i].time , price : data.Data[i].open} );
+      prices.push({timestamp : data.Data[i].time, price: data.Data[i].open} );
     }
     return prices;
   }
