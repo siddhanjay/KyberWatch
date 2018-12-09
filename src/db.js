@@ -70,7 +70,7 @@ class DB {
   }
 
   async getTokenTradeData(token, start, stop, skip) {
-    skip = false;
+    skip = skip || true;
 
     // Find the data that is present in the DB within this timestamp.
     const getQuery = () => {
@@ -122,8 +122,9 @@ class DB {
       }
     }
 
-    const newResults = await getQuery();
-    return newResults;
+    const volume = await getQuery();
+    const prices = await EtherScan.getPrices({token: token});
+    return {volume: volume, prices: prices};
   }
 };
 

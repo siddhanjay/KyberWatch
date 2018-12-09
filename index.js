@@ -47,16 +47,6 @@ app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
     return;
   }
 
-  // Validate the timestamps.
-  // if (!Utils.isValidTimestamp(req.query.start)) {
-  //   res.status(400).send({status: "error", error: "invalid start timestamp"});
-  //   return;
-  // }
-  // if (!Utils.isValidTimestamp(req.query.stop)) {
-  //   res.status(400).send({status: "error", error: "invalid stop timestamp"});
-  //   return;
-  // }
-
   // Convert the timestamp to block numbers.
   try {
     const ret = await db.getTokenTradeData(req.params.token, parseInt(req.query.start), parseInt(req.query.stop));

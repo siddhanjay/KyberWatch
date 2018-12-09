@@ -109,18 +109,19 @@ $(document).ready(function() {
 
           let prices_USD = [];
           let volume = [];
-          for (let i = 0; i < response.results.length; ++i) {
-            if (response.results[i].price_usd && response.results[i].price_usd > 0) {
+          for (let i = 0; i < response.results.prices.length; ++i) {
+            if (response.results.prices[i].price && response.results.prices[i].price > 0) {
               prices_USD.push([
-                response.results[i].timestamp * 1000,
-                response.results[i].price_usd
+                response.results.prices[i].timestamp * 1000,
+                response.results.prices[i].price
               ]);
             }
-
-            if (response.results[i].quantity && response.results[i].quantity > 0) {
+          }
+          for (let i = 0; i < response.results.volume.length; ++i) {
+            if (response.results.volume[i].quantity && response.results.volume[i].quantity > 0) {
               volume.push([
-                response.results[i].timestamp * 1000,
-                response.results[i].quantity
+                response.results.volume[i].timestamp * 1000,
+                response.results.volume[i].quantity
               ]);
             }
           }
