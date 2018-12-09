@@ -25,6 +25,7 @@ The project can be accessed [here](http://ethsg.herokuapp.com/)
 ## Authors
 
 [Robin Thomas](https://github.com/robin-thomas)
+
 [Siddhanjay Godre](https://github.com/siddhanjay)
 
 ## License
