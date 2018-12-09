@@ -9,7 +9,7 @@ const DB = require('./src/db.js');
 const db = new DB();
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 80;
 
 app.use(cors());
 app.use(express.json());
@@ -46,16 +46,6 @@ app.get(config.app.path + '/currencies/:token/trades', async (req, res) => {
     res.status(400).send({status: "error", error: "missing stop timestamp"});
     return;
   }
-
-  // Validate the timestamps.
-  // if (!Utils.isValidTimestamp(req.query.start)) {
-  //   res.status(400).send({status: "error", error: "invalid start timestamp"});
-  //   return;
-  // }
-  // if (!Utils.isValidTimestamp(req.query.stop)) {
-  //   res.status(400).send({status: "error", error: "invalid stop timestamp"});
-  //   return;
-  // }
 
   // Convert the timestamp to block numbers.
   try {
@@ -114,7 +104,7 @@ app.get(config.app.path + '/test/:token', async (req, res) => {
 // Returns a list of the most recent orders in Kyber
 app.get(config.app.path + '/currencies/orders', async (req, res) => {
   try {
-    const orders = await Kyber.getLastOrders(req.query.count);
+    const orders = await Kyber.getLastOrders(parseInt(req.query.count));
     res.status(200).send({status: "ok", results: orders});
   } catch (err) {
     res.status(500).send({status: "error", error: err.message});

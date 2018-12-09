@@ -69,12 +69,12 @@ const Kyber = {
         const txns = await EtherScan.getTxnsByAddress(args);
         if (txns.length > 0) {
           results = results.concat(txns.reverse());
-          if (results.length >= 2 * count) {
-            return results;
-          }
+        }
+        if (results.length >= 2 * count) {
+          return results;
         }
       } catch (err) {
-        console.log(err.message);
+        console.log(err.message)
         return results;
       }
 

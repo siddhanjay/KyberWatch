@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
-  const tokenList = $('#token-list');
+  const tokenList = $('#token-list'),
+        tokenBalance = $('#token-balance');
 
   const hour24High = $('#24hourhigh'),
         hour24Low  = $('#24hourlow'),
@@ -27,6 +28,7 @@ $(document).ready(function() {
               if (!flag) {
                 Token.loadStats(tokens[i]);
                 Token.loadOrders(tokens[i]);
+                Token.loadGraph(tokens[i]);
                 flag = true;
               }
               html += '<option value="' + tokens[i] + '">' + tokens[i] + '</option>'
@@ -36,6 +38,8 @@ $(document).ready(function() {
           tokenList.on('change', (e) => {
             tokenList.prop('disabled', true);
             Token.loadStats(e.target.value);
+            Token.loadGraph(e.target.value);
+            Metamask.displayERC20Balance();
             tokenList.prop('disabled', false);
           });
         },
@@ -67,9 +71,10 @@ $(document).ready(function() {
       $.get({
         url: host + '/orders',
         data: {
-          "count": 10
+          "count": 10,
         },
         success: (response) => {
+          console.log(response);
           if (response && response.results && response.results.length > 0) {
             let map = {};
             for (let i = 0; i < response.results.length; ++i) {
@@ -96,39 +101,32 @@ $(document).ready(function() {
       $.get({
         url: host + '/' + token + '/trades',
         data: {
-          "start": "1544233022",
+          "start": "1542033022",
           "stop": "1544253022",
         },
         success: (response) => {
           console.log(response);
 
-          let prices_ETH = [];
           let prices_USD = [];
           let volume = [];
-          for (let i = 0; i < response.results.length; ++i) {
-            if (response.results[i].price_eth && response.results[i].price_eth > 0) {
-              prices_ETH.push([
-                response.results[i].timestamp * 1000,
-                response.results[i].price_eth
-              ]);
-            }
-
-            if (response.results[i].price_usd && response.results[i].price_usd > 0) {
+          for (let i = 0; i < response.results.prices.length; ++i) {
+            if (response.results.prices[i].price && response.results.prices[i].price > 0) {
               prices_USD.push([
-                response.results[i].timestamp * 1000,
-                response.results[i].price_usd
+                response.results.prices[i].timestamp * 1000,
+                response.results.prices[i].price
               ]);
             }
-
-            if (response.results[i].quantity && response.results[i].quantity > 0) {
+          }
+          for (let i = 0; i < response.results.volume.length; ++i) {
+            if (response.results.volume[i].quantity && response.results.volume[i].quantity > 0) {
               volume.push([
-                response.results[i].timestamp * 1000,
-                response.results[i].quantity
+                response.results.volume[i].timestamp * 1000,
+                response.results.volume[i].quantity
               ]);
             }
           }
 
-          Highcharts.stockChart('token-prices-graph', {
+          Highcharts.stockChart('token-price-graph', {
             rangeSelector: {
               selected: 1
             },
@@ -177,16 +175,20 @@ $(document).ready(function() {
         },
       });
     },
-
-    reset: () => {
-
-    }
   };
   Token.load();
-  Token.loadGraph(tokenList.val());
 
-  // Keep refreshing the Token stats.
-  //setInterval(() => Token.loadStats(tokenList.val()), 1000);
+
+const promisify = (inner) =>
+    new Promise((resolve, reject) =>
+        inner((err, res) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(res);
+            }
+        })
+    );
 
   const Metamask = {
     getWeb3: () => {
@@ -196,8 +198,8 @@ $(document).ready(function() {
 
           ethereum.enable()
             .then(() => resolve(null))
-            .catch((err) => reject(err.message));
-        } else if (web3) {
+            .catch((err) => reject('User has denied access to eth account!'));
+        } else if (window.web3) {
           reject('Legacy dapp browser detected. Update!');
         } else {
           reject('Non-Ethereum browser detected. Use MetaMask!');
@@ -205,12 +207,43 @@ $(document).ready(function() {
       });
     },
 
+    displayERC20Balance: () => {
+      web3.eth.getAccounts(async (err, results) => {
+        if (!err) {
+          await Metamask.displayERC20BalanceHelper(results[0]);
+        }
+      })
+    },
+
+    displayERC20BalanceHelper: async (address) => {
+      const contractAddresses = {
+        "OMG": "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b",
+        "KNC": "0x4E470dc7321E84CA96FcAEDD0C8aBCebbAEB68C6",
+        "ZIL": "0x28A51c80cC94DEf5809de9969ea6419C9094877B",
+      };
+
+      const contractAddress = contractAddresses[tokenList.val()];
+      const contractABI = human_standard_token_abi;
+      const contract = web3.eth.contract(contractABI)
+      const tokenContract = contract.at(contractAddress);
+
+      const decimals = promisify(cb => tokenContract.decimals(cb));
+      const balance = promisify(cb => tokenContract.balanceOf(address, cb));
+
+      try {
+        adjustedBalance = await balance / Math.pow(10, await decimals);
+        tokenBalance.html(adjustedBalance);
+      } catch (error) {
+        console.log('error' + error);
+      }
+    },
   };
 
   metamask.on('click', () => {
     Metamask.getWeb3().then(() => {
       metamask.fadeOut();
-      web3.eth.getAccounts().then(e => console.log(e));
+    }).then(()=> {
+      Metamask.displayERC20Balance();
     });
   });
 });

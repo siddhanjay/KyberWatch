@@ -5,9 +5,11 @@
     <title>KyberWatch - Query Kyber Network for historical data</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
   </head>
   <body>
     <div id="header">
+      <div id="logo">KyberWatch</div>
       <div id="connect-metamask"><button type="button" class="btn btn-danger">MetaMask</button></div>
     </div>
     <div id="nav-bar"></div>
@@ -15,8 +17,12 @@
       <div id="main-content">
         <div class="container-fluid">
           <div class="row">
-            <div class="col-md-1">
+            <div class="col-md-2">
               <select class="form-control" id="token-list"></select>
+            </div>
+            <div class="col-md-2">
+              <h4 style="margin-top:3px;">Balance: </h4>
+              <b id="token-balance">0.00000</b>
             </div>
           </div>
           <div class="row">&nbsp;</div>
@@ -99,5 +105,6 @@
   <script type="text/javascript" src="https://code.highcharts.com/stock/highstock.js"></script>
   <script type="text/javascript" src="https://code.highcharts.com/stock/modules/exporting.js"></script>
   <script type="text/javascript" src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+  <script type="text/javascript" src="abi.js"></script>
   <script type="text/javascript" src="index.js"></script>
 </html>
