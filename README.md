@@ -1,57 +1,30 @@
 # KyberWatch
 
-KyberWatch is a tool for querying historical data from 
+KyberWatch is an API and a visualization tool which the users can use to query the historical price and volume trade data for the different tokens supported on Kyber Network. KyberWatch queries the volumetric data from the Kyber smart contract transactions for the token swap events. All the queried data is cached in a MySql database on an AWS instance for faster access.KyberWatch also allows to unlock their metamask account and check balances. 
 
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+Please install npm and node to build the project.
 
-```
-Give examples
-```
+### API endpoints
 
-### Installing
+/api/v1/kyber/currencies => list of supported currencies
 
-A step by step series of examples that tell you how to get a development env running
+/api/v1/kyber/currencies/:token/trades?start=&end= => list of trades for valid token supported by kyber within the 2 timestamps
 
-Say what the step will be
+/api/v1/kyber/currencies/:token/stats => 24 hour stats of Kyber supported token
 
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
+/api/v1/kyber/currencies/:token/orders => few last orders of any kyber suppported currencies
 
 
-## Deployment
+## Usage
 
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
+The project can be accessed [here](http://ethsg.herokuapp.com/)
 
 ## Authors
 
 [Robin Thomas](https://github.com/robin-thomas)
-
 [Siddhanjay Godre](https://github.com/siddhanjay)
 
 ## License
