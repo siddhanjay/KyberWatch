@@ -51,9 +51,8 @@ Add additional notes about how to deploy this on a live system
 ## Authors
 
 [Robin Thomas](https://github.com/robin-thomas)
-[Siddhanjay Godre](https://github.com/siddhanjay)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+[Siddhanjay Godre](https://github.com/siddhanjay)
 
 ## License
 
